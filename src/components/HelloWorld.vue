@@ -26,10 +26,16 @@
   const deleteTodo = id => {
     state.todos = state.todos.filter( todo => todo.id != id)
   };
+
+  /* toggle Todo */
+  const toggleTodo = id => {
+    const index = state.todos.findIndex( todo => todo.id === id )
+    state.todos[index].done = !state.todos[index].done
+  };
 </script>
 
 <template>
-  <div class="h-100 w-full flex items-center justify-center bg-teal-lightest font-sans">
+  <div class="min-h-screen w-full flex items-center justify-center font-sans">
     <div class="bg-white p-6 m-4 w-full lg:w-3/4 lg:max-w-lg">
       <div class="mb-4">
         <h1 class="text-grey-darkest">Todo List</h1>
@@ -41,25 +47,29 @@
               placeholder="Ajouter Todo">
             <button
               :disabled="!state.newTodoContent"
-              :class="{'cursor-pointer bg-black hover:bg-teal' : state.newTodoContent, 'bg-gray opacity-50' : !state.newTodoContent}"
+              :class="state.newTodoContent ? 'cursor-pointer bg-black hover:bg-green' : 'bg-gray opacity-50'"
               class="flex-no-shrin px-6 py-2 border-1 text-white border-none  hover:text-white ">Ajouter</button>
           </div>
         </form>
       </div>
       <div>
         <div 
-            v-for="todo in state.todos"
+            v-for="(todo, index) in state.todos"
             :key="todo.id"
-            class="flex mb-4 items-center">
+            :class="{'bg-green-100' : todo.done, 'mb-4': index !== state.todos.length - 1}"
+            class="flex px-4 items-center">
               <p 
                 :class="{'line-through' : todo.done}"
                 class="w-full text-grey-darkest">{{ todo.content }}</p>
-              <button class="flex-no-shrink cursor-pointer p-2 ml-4 mr-2 border-none bg-white hover:text-white text-green hover:bg-green">
-                <Icon :icon="!todo.done ? 'lucide:check' : 'ant-design:close-outlined'" class="text-xl" />
+              <button 
+                @click="toggleTodo(todo.id)"             
+                :class="todo.done ? 'bg-green-600 text-white' : ' text-white hover:bg-green'"
+                class="flex-no-shrink cursor-pointer p-2 ml-4 mr-2 border-none">
+                <Icon :icon="todo.done ? 'lucide:check' : 'ant-design:close-outlined'" class="text-xl" />
               </button>
               <button 
                 @click="deleteTodo(todo.id)"
-                class="flex-no-shrink cursor-pointer p-2 ml-2 border-none bg-white text-red hover:text-white hover:bg-red">
+                class="flex-no-shrink cursor-pointer p-2 ml-2 border-none text-white bg-red-600">
                 <Icon icon="lucide:trash-2" class="text-xl" />
               </button>
         </div>
