@@ -1,14 +1,38 @@
 <script setup>
   /* imports */
   import { Icon } from '@iconify/vue'
-  import { ref, reactive } from 'vue'
+  import { ref, reactive, onMounted } from 'vue'
   import { v4 as uuidv4 } from 'uuid'
+
+  import { collection, getDocs, query } from "firebase/firestore";
+  import { db } from '../firebase'
 
   /* todos */
   const state = reactive({
-    todos: [{id:'id1', content: 'content 1', done: false}, {id:'id2', content: 'content 2', done: true}],
+    todos: [],
+    // todos: [{id:'id1', content: 'content 1', done: false}, {id:'id2', content: 'content 2', done: true}],
     newTodoContent: ''
   });
+
+  /* get todos */
+  onMounted(async()=> {
+
+    const q = query(collection(db, "todos"));
+    let fbTodos = []
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      // doc.data() is never undefined for query doc snapshots
+      // console.log(doc.id, " => ", doc.data());
+      const todos = {
+        id: doc.id,
+        content: doc.data().content,
+        done: doc.data().done
+      }
+      fbTodos.push(todos)
+    });
+
+    state.todos = fbTodos
+  })
 
   /* add todo */
   const addTodo = () =>{
@@ -37,7 +61,7 @@
 <template>
   <div class="min-h-screen w-full flex items-center justify-center font-sans">
     <div class="bg-white p-6 m-4 w-full lg:w-3/4 lg:max-w-lg">
-      <div class="mb-4">
+      <div class="mb-8">
         <h1 class="text-grey-darkest">Todo List</h1>
         <form @submit.prevent="addTodo">
           <div class="flex">
