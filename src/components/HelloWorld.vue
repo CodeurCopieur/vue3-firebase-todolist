@@ -10,8 +10,6 @@
     newTodoContent: ''
   });
 
-  const { todos } = state;
-
   /* add todo */
   const addTodo = () =>{
     const newTodo = {
@@ -22,6 +20,11 @@
 
     state.todos.unshift(newTodo)
     state.newTodoContent = ''
+  };
+
+  /* delete todo */
+  const deleteTodo = id => {
+    state.todos = state.todos.filter( todo => todo.id != id)
   };
 </script>
 
@@ -45,7 +48,7 @@
       </div>
       <div>
         <div 
-            v-for="todo in todos"
+            v-for="todo in state.todos"
             :key="todo.id"
             class="flex mb-4 items-center">
               <p 
@@ -54,7 +57,9 @@
               <button class="flex-no-shrink cursor-pointer p-2 ml-4 mr-2 border-none bg-white hover:text-white text-green hover:bg-green">
                 <Icon :icon="!todo.done ? 'lucide:check' : 'ant-design:close-outlined'" class="text-xl" />
               </button>
-              <button class="flex-no-shrink cursor-pointer p-2 ml-2 border-none bg-white text-red hover:text-white hover:bg-red">
+              <button 
+                @click="deleteTodo(todo.id)"
+                class="flex-no-shrink cursor-pointer p-2 ml-2 border-none bg-white text-red hover:text-white hover:bg-red">
                 <Icon icon="lucide:trash-2" class="text-xl" />
               </button>
         </div>
