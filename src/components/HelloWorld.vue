@@ -4,34 +4,47 @@
   import { ref, reactive, onMounted } from 'vue'
   import { v4 as uuidv4 } from 'uuid'
 
-  import { collection, getDocs, query } from "firebase/firestore";
+  import { collection, getDocs, onSnapshot, query } from "firebase/firestore";
   import { db } from '../firebase'
 
   /* todos */
   const state = reactive({
     todos: [],
-    // todos: [{id:'id1', content: 'content 1', done: false}, {id:'id2', content: 'content 2', done: true}],
     newTodoContent: ''
   });
 
   /* get todos */
-  onMounted(async()=> {
+  onMounted(()=> {
 
-    const q = query(collection(db, "todos"));
-    let fbTodos = []
-    const querySnapshot = await getDocs(q);
-    querySnapshot.forEach((doc) => {
-      // doc.data() is never undefined for query doc snapshots
-      // console.log(doc.id, " => ", doc.data());
-      const todos = {
-        id: doc.id,
-        content: doc.data().content,
-        done: doc.data().done
-      }
-      fbTodos.push(todos)
+    // const q = query(collection(db, "todos"));
+    // let fbTodos = []
+    // const querySnapshot = await getDocs(q);
+    // querySnapshot.forEach((doc) => {
+    //   // doc.data() is never undefined for query doc snapshots
+    //   // console.log(doc.id, " => ", doc.data());
+    //   const todos = {
+    //     id: doc.id,
+    //     content: doc.data().content,
+    //     done: doc.data().done
+    //   }
+    //   fbTodos.push(todos)
+    // });
+
+    // state.todos = fbTodos
+    
+    const q = collection(db, "todos");
+    onSnapshot(q, (querySnapshot) => {
+      let fbTodos = [];
+      querySnapshot.forEach((doc) => {
+          const todo = {
+            id: doc.id,
+            content: doc.data().content,
+            done: doc.data().done
+          }
+          fbTodos.push(todo)
+      });
+      state.todos = fbTodos
     });
-
-    state.todos = fbTodos
   })
 
   /* add todo */
