@@ -1,10 +1,9 @@
 <script setup>
   /* imports */
   import { Icon } from '@iconify/vue'
-  import { ref, reactive, onMounted } from 'vue'
-  import { v4 as uuidv4 } from 'uuid'
+  import { reactive, onMounted } from 'vue'
 
-  import { collection, getDocs, onSnapshot, query } from "firebase/firestore";
+  import { collection, addDoc, onSnapshot } from "firebase/firestore";
   import { db } from '../firebase'
 
   /* todos */
@@ -15,22 +14,6 @@
 
   /* get todos */
   onMounted(()=> {
-
-    // const q = query(collection(db, "todos"));
-    // let fbTodos = []
-    // const querySnapshot = await getDocs(q);
-    // querySnapshot.forEach((doc) => {
-    //   // doc.data() is never undefined for query doc snapshots
-    //   // console.log(doc.id, " => ", doc.data());
-    //   const todos = {
-    //     id: doc.id,
-    //     content: doc.data().content,
-    //     done: doc.data().done
-    //   }
-    //   fbTodos.push(todos)
-    // });
-
-    // state.todos = fbTodos
     
     const q = collection(db, "todos");
     onSnapshot(q, (querySnapshot) => {
@@ -49,13 +32,11 @@
 
   /* add todo */
   const addTodo = () =>{
-    const newTodo = {
-      id:uuidv4(),
+    addDoc(collection(db, "todos"), {
       content: state.newTodoContent,
       done: false
-    }
+    });
 
-    state.todos.unshift(newTodo)
     state.newTodoContent = ''
   };
 
