@@ -3,8 +3,11 @@
   import { Icon } from '@iconify/vue'
   import { reactive, onMounted } from 'vue'
 
-  import { collection, addDoc, onSnapshot } from "firebase/firestore";
+  import { collection, onSnapshot, addDoc, deleteDoc, doc  } from "firebase/firestore";
   import { db } from '../firebase'
+
+  /* firebase */
+  const q = collection(db, "todos");
 
   /* todos */
   const state = reactive({
@@ -15,7 +18,7 @@
   /* get todos */
   onMounted(()=> {
     
-    const q = collection(db, "todos");
+
     onSnapshot(q, (querySnapshot) => {
       let fbTodos = [];
       querySnapshot.forEach((doc) => {
@@ -32,7 +35,7 @@
 
   /* add todo */
   const addTodo = () =>{
-    addDoc(collection(db, "todos"), {
+    addDoc(q, {
       content: state.newTodoContent,
       done: false
     });
@@ -42,7 +45,8 @@
 
   /* delete todo */
   const deleteTodo = id => {
-    state.todos = state.todos.filter( todo => todo.id != id)
+    // state.todos = state.todos.filter( todo => todo.id != id)
+    deleteDoc(doc(q, id))
   };
 
   /* toggle Todo */
