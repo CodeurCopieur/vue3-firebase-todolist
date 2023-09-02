@@ -3,7 +3,7 @@
   import { Icon } from '@iconify/vue'
   import { reactive, onMounted } from 'vue'
 
-  import { collection, onSnapshot, addDoc, deleteDoc, doc  } from "firebase/firestore";
+  import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc  } from "firebase/firestore";
   import { db } from '../firebase'
 
   /* firebase */
@@ -52,7 +52,12 @@
   /* toggle Todo */
   const toggleTodo = id => {
     const index = state.todos.findIndex( todo => todo.id === id )
-    state.todos[index].done = !state.todos[index].done
+    // state.todos[index].done = !state.todos[index].done
+
+    // Set the "capital" field of the city 'DC'
+    updateDoc(doc(db, "todos", id), {
+      done: !state.todos[index].done
+    });
   };
 </script>
 
