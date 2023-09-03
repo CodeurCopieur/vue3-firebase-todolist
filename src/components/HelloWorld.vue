@@ -3,11 +3,14 @@
   import { Icon } from '@iconify/vue'
   import { reactive, onMounted } from 'vue'
 
-  import { collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc  } from "firebase/firestore";
+  import { collection, onSnapshot, addDoc,
+           updateDoc, deleteDoc, doc,
+           query, orderBy  } from "firebase/firestore";
   import { db } from '../firebase'
 
   /* firebase */
   const q = collection(db, "todos");
+  const todosCollectionQuery = query(q, orderBy("date", "desc"));
 
   /* todos */
   const state = reactive({
@@ -19,7 +22,7 @@
   onMounted(()=> {
     
 
-    onSnapshot(q, (querySnapshot) => {
+    onSnapshot(todosCollectionQuery, (querySnapshot) => {
       let fbTodos = [];
       querySnapshot.forEach((doc) => {
           const todo = {
@@ -37,7 +40,8 @@
   const addTodo = () =>{
     addDoc(q, {
       content: state.newTodoContent,
-      done: false
+      done: false,
+      date: Date.now()
     });
 
     state.newTodoContent = ''
@@ -55,7 +59,7 @@
     // state.todos[index].done = !state.todos[index].done
 
     // Set the "capital" field of the city 'DC'
-    updateDoc(doc(db, "todos", id), {
+    updateDoc(doc(q, id), {
       done: !state.todos[index].done
     });
   };
